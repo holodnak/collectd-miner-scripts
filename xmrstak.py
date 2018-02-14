@@ -58,7 +58,6 @@ def readvals_xmrstak(url, rigname):
         hashrate = j['hashrate']
         for n in hashrate['threads']:
             collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(n[0])))
-#            dispatch_value(rigname, 'worker' + str(num), 'rate', [str(n[0])])
             miner.dispatch_worker(num, rigname, cfg['algo'], [str(n[0]), 0, 0, 0])
             num = num + 1
     except NameError, e:
