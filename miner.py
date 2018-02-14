@@ -47,3 +47,10 @@ def GetData_RestApi(url):
         j = ''
         print "error loading/parsing json"
     return j
+
+def dispatch_worker(ti, rigname, plugname, v):
+    c = collectd.Values()
+    c.host = rigname
+    c.plugin = plugname
+    c.type_instance = str(ti)
+    c.dispatch(type = 'worker', values = v)

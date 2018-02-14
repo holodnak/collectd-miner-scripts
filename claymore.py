@@ -17,21 +17,13 @@ cfg = {
     'units':    'hash',
     'interval': '10',
     'factor':   '1000',
-    'urlstr':   '{IP}:3333'
+    'urlstr':   '{IP}:3333',
+    'rigs':     []
 }
-
-def dispatch_value(rigname, ti, t, v):
-    c = collectd.Values()
-    c.host = rigname
-    c.plugin = cfg['algo']
-    c.type_instance = ti
-    c.dispatch(type = t, values = v)
-
-# store all bminer instances
-rigs = []
 
 def readconf(config):
     for node in config.children:
+        collectd.info('node: {0} = {1}'.format(node.key, node.values[0]))
 
         # new miner instance definition
         if node.key == 'Instance':
@@ -41,10 +33,11 @@ def readconf(config):
 
             # iterate the children and fill in the rig data dict
             for inst in node.children:
+                collectd.info('instance {0} : {1} = {2}'.format(node.values[0], inst.key, inst.values[0]))
                 rig[inst.key] = inst.values[0]
 
             # add miner to rig list
-            rigs.append(rig)
+            cfg['rigs'].append(rig)
 
         # global config variables
         for k in ['interval']:
@@ -87,12 +80,20 @@ def readvals_claymore(url, rigname):
             return
 
         # send hashrates to collectd
+        workers = {}
+
         ratestr = j['result'][3]
         rates = ratestr.split(';')
         num = 0
         for n in rates:
-            collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num) + "/rate", str(n)))
-            dispatch_value(rigname, 'worker' + str(num), 'rate', [str(n)])
+            w = { 
+              'rate': str(n),
+              'temp': 0,
+              'watt': 0,
+              'fan' : 0,
+              'num' : num
+            }
+            workers[num] = w
             num = num + 1
 
         # send temperatures and fan speeds to collectd
@@ -101,14 +102,17 @@ def readvals_claymore(url, rigname):
         num = 0
         for n in tempfans:
             if i == 0:
-                collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num) + "/temp", str(n)))
-                dispatch_value(rigname, 'worker' + str(num), 'temp', [str(n)])
+                workers[num]['temp'] = str(n)
                 i = 1
             else:
-                collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num) + "/fan", str(n)))
-                dispatch_value(rigname, 'worker' + str(num), 'fan', [str(n)])
+                workers[num]['fan'] = str(n)
                 i = 0
                 num = num + 1
+
+        for n in workers:
+            w = workers[n]
+            collectd.info('dispatching: worker{0} : {1} ({2} {3} {4})'.format(w['num'], w['rate'], w['temp'], w['watt'], w['fan']))
+            miner.dispatch_worker(w['num'], rigname, cfg['algo'], [w['rate'], w['temp'], w['watt'], w['fan']])
 
     except NameError, e:
         collectd.info('error parsing json for {0}:  {1}'.format(cfg['software'], e))
@@ -117,12 +121,9 @@ def readvals_claymore(url, rigname):
     return
 
 def readvals():
-    try:
-        for rig in rigs:
-            collectd.info('clay_reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
-            readvals_claymore(rig['url'], rig['rigname'])
-    except KeyError, e:
-        collectd.info(e)
+    for rig in cfg['rigs']:
+        collectd.info('reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
+        readvals_claymore(rig['url'], rig['rigname'])
 
 collectd.register_config(readconf)
 collectd.register_read(readvals, int(cfg['interval']))

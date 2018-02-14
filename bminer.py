@@ -17,20 +17,9 @@ cfg = {
     'units':    'sol',
     'interval': '10',
     'factor':   '1',
-    'urlstr':   'http://{IP}:1880/api/status'
+    'urlstr':   'http://{IP}:1880/api/status',
+    'rigs':     []
 }
-
-cons = True
-
-def dispatch_value(rigname, ti, t, v):
-    c = collectd.Values()
-    c.host = rigname
-    c.plugin = cfg['algo']
-    c.type_instance = ti
-    c.dispatch(type = t, values = v)
-
-# store all bminer instances
-rigs = []
 
 def readconf(config):
     for node in config.children:
@@ -48,20 +37,19 @@ def readconf(config):
                 rig[inst.key] = inst.values[0]
 
             # add miner to rig list
-            rigs.append(rig)
+            cfg['rigs'].append(rig)
 
         # global config variables
         for k in ['interval']:
             if node.key == k:
                 cfg[k] = node.values[0]
 
-
 def readvals_bminer(url, rigname):
     try:
         j = miner.GetData_RestApi(url)
     except ValueError, e:
         collectd.info('error getting restapi for {0}:  {1}'.format(cfg['software'], e))
-        return str(e)
+        return
 
     start_time = j['start_time']
     end_time = time.time()
@@ -70,30 +58,20 @@ def readvals_bminer(url, rigname):
     uptime = end_time - start_time
     
     num = 0
-    rates = []
-    temps = []
-    watts = []
     num_miners = len(j['miners'])
     miners = j['miners']
     for x in miners:
         m = miners[x]
         device = m['device']
         solver = m['solver']
-        ti = 'worker' + str(num)
-        dispatch_value(rigname, ti, 'rate', [solver['solution_rate']])
-        dispatch_value(rigname, ti, 'temp', [device['temperature']])
-        dispatch_value(rigname, ti, 'watt', [device['power']])
+        miner.dispatch_worker(num, rigname, cfg['algo'], [solver['solution_rate'], device['temperature'], device['power'], 0])
         num = num + 1
-    return ''
+    return
 
 def readvals():
-    try:
-        for rig in rigs:
-            collectd.info('reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
-            error = readvals_bminer(rig['url'], rig['rigname'])
-            print(error)
-    except KeyError, e:
-        print(e)
+    for rig in cfg['rigs']:
+        collectd.info('reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
+        readvals_bminer(rig['url'], rig['rigname'])
 
 collectd.register_config(readconf)
 collectd.register_read(readvals, int(cfg['interval']))

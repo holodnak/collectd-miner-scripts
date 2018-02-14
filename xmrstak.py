@@ -17,20 +17,9 @@ cfg = {
     'units':    'hash',
     'interval': '10',
     'factor':   '1',
-    'urlstr':   'http://{IP}:40000/api.json'
+    'urlstr':   'http://{IP}:40000/api.json',
+    'rigs':     []
 }
-
-cons = True
-
-def dispatch_value(rigname, ti, t, v):
-    c = collectd.Values()
-    c.host = rigname
-    c.plugin = cfg['algo']
-    c.type_instance = ti
-    c.dispatch(type = t, values = v)
-
-# store all bminer instances
-rigs = []
 
 def readconf(config):
     for node in config.children:
@@ -48,7 +37,7 @@ def readconf(config):
                 rig[inst.key] = inst.values[0]
 
             # add miner to rig list
-            rigs.append(rig)
+            cfg['rigs'].append(rig)
 
         # global config variables
         for k in ['interval']:
@@ -69,7 +58,8 @@ def readvals_xmrstak(url, rigname):
         hashrate = j['hashrate']
         for n in hashrate['threads']:
             collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(n[0])))
-            dispatch_value(rigname, 'worker' + str(num), 'rate', [str(n[0])])
+#            dispatch_value(rigname, 'worker' + str(num), 'rate', [str(n[0])])
+            miner.dispatch_worker(num, rigname, cfg['algo'], [str(n[0]), 0, 0, 0])
             num = num + 1
     except NameError, e:
         collectd.info('error parsing json for {0}:  {1}'.format(cfg['software'], e))
@@ -78,13 +68,9 @@ def readvals_xmrstak(url, rigname):
     return
 
 def readvals():
-    try:
-        for rig in rigs:
-            collectd.info('xmr_reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
-            error = readvals_xmrstak(rig['url'], rig['rigname'])
-            print(error)
-    except KeyError, e:
-        print(e)
+    for rig in cfg['rigs']:
+        collectd.info('reading: {0} @ {1}'.format(rig['rigname'], rig['url']))
+        readvals_xmrstak(rig['url'], rig['rigname'])
 
 collectd.register_config(readconf)
 collectd.register_read(readvals, int(cfg['interval']))
