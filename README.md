@@ -6,13 +6,15 @@ All of the scripts use some custom data types, make sure to add it to your confi
 
 Example:
 
+```
   TypesDB "/home/james/bin/types.db.custom"
-
+```
 
 To use the plugin, add lines similar to the lines below to your configuration file.
 
 All plugins have the same configuration options.  Declare multiple instances for the plugin to monitor multiple miners.
 
+```XML
 <Plugin python>
         ModulePath "/home/james/bin"
         LogTraces true
@@ -25,7 +27,7 @@ All plugins have the same configuration options.  Declare multiple instances for
                 </Instance>
         </Module>
 </Plugin>
-
+```
 
 ** beta software, contains virus-stealing malware **
 
