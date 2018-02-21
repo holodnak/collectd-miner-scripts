@@ -51,7 +51,12 @@ def readvals_bminer(url, rigname):
         collectd.info('error getting restapi for {0}:  {1}'.format(cfg['software'], e))
         return
 
-    start_time = j['start_time']
+    try:
+        start_time = j['start_time']
+    except:
+        collectd.info('error getting restapi for {0}'.format(rigname))
+        return
+
     end_time = time.time()
 
     software = "bminer " + j['version']
