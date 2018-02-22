@@ -18,6 +18,7 @@ cfg = {
     'interval': '10',
     'factor':   '1',
     'urlstr':   'http://{IP}:1880/api/status',
+    'master':   'http://192.168.50.65:5000/submit/james',
     'rigs':     []
 }
 
@@ -71,7 +72,7 @@ def readvals_bminer(url, rigname):
         solver = m['solver']
         miner.dispatch_worker(num, rigname, cfg['algo'], [solver['solution_rate'], device['temperature'], device['power'], 0])
         num = num + 1
-    r = requests.post('http://192.168.50.65:5000/submit/james', json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool})
+    miner.dispatch_miner(cfg['master'], 'rigpass', rigname, software, cfg['algo'], uptime, pool)
     return
 
 def readvals():
