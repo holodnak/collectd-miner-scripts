@@ -61,7 +61,7 @@ def readvals_bminer(url, rigname):
 
     software = "bminer " + j['version']
     uptime = end_time - start_time
-    
+    pool = ''
     num = 0
     num_miners = len(j['miners'])
     miners = j['miners']
@@ -71,6 +71,7 @@ def readvals_bminer(url, rigname):
         solver = m['solver']
         miner.dispatch_worker(num, rigname, cfg['algo'], [solver['solution_rate'], device['temperature'], device['power'], 0])
         num = num + 1
+    r = requests.post('http://192.168.50.65:5000/submit/james', json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool})
     return
 
 def readvals():
