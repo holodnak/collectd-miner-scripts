@@ -61,7 +61,7 @@ def readvals_xmrstak(url, rigname):
             collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(n[0])))
             miner.dispatch_worker(num, rigname, cfg['algo'], [str(n[0]), 0, 0, 0])
             num = num + 1
-        r = requests.post('http://192.168.50.65:5000/submit/james', json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool})
+        r = requests.post('http://192.168.50.65:5000/submit/james', json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool, "factor": 1, "unit": 'sol'})
     except NameError, e:
         collectd.info('error parsing json for {0}:  {1}'.format(cfg['software'], e))
         return

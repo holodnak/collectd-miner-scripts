@@ -72,7 +72,7 @@ def readvals_bminer(url, rigname):
         solver = m['solver']
         miner.dispatch_worker(num, rigname, cfg['algo'], [solver['solution_rate'], device['temperature'], device['power'], 0])
         num = num + 1
-    miner.dispatch_miner(cfg['master'], 'rigpass', rigname, software, cfg['algo'], uptime, pool)
+    miner.dispatch_miner(cfg['master'], 'rigpass', rigname, software, cfg['algo'], uptime, pool, 1, 'sol')
     return
 
 def readvals():

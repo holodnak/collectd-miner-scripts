@@ -55,9 +55,9 @@ def dispatch_worker(ti, rigname, plugname, v):
     c.type_instance = str(ti)
     c.dispatch(type = 'worker', values = v)
 
-def dispatch_miner(remote_url, password, rigname, software, algo, uptime = 0, pool = ''):
+def dispatch_miner(remote_url, password, rigname, software, algo, uptime = 0, pool = '', factor = 1, unit = 'sol'):
     try:
-        r = requests.post(remote_url, json={"password": password, "rigname": rigname, "uptime": uptime, "software": software, "algo": algo, "pool": pool}, timeout=10)
+        r = requests.post(remote_url, json={"password": password, "rigname": rigname, "uptime": uptime, "software": software, "algo": algo, "pool": pool, "factor": factor, "unit": unit}, timeout=10)
     except:
         collectd.info('error POST-ing miner data to remote host: {0}'.format(remote_url))
 
