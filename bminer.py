@@ -18,7 +18,6 @@ cfg = {
     'interval': '10',
     'factor':   '1',
     'urlstr':   'http://{IP}:1880/api/status',
-    'master':   'http://192.168.50.65:5000/submit/james',
     'rigs':     []
 }
 
