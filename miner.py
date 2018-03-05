@@ -15,7 +15,7 @@ def GetData_JsonRpc(url):
 	ip = u[0]
 	port = u[1]
 	j = ''
-	collectd.info("GetData_JsonRpc: connecting to: " + ip + ':' + port)
+#	collectd.info("GetData_JsonRpc: connecting to: " + ip + ':' + port)
 
 	json_str = "{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\"}";
 	try:
