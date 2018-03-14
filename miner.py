@@ -9,11 +9,12 @@ import collectd
 # for ethminer and claymore
 def GetData_JsonRpc(url):
 
-	u1 = urlparse(url)
-	url = u1.netloc
-	u = url.split(':')
-	ip = u[0]
-	port = u[1]
+	ul = urlparse(url)
+	ip = ul.hostname
+	port = ul.port
+        u = url.split(':')
+        ip = u[0]
+        port = u[1]
 	j = ''
 #	collectd.info("GetData_JsonRpc: connecting to: " + ip + ':' + port)
 

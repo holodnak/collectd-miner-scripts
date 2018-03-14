@@ -113,6 +113,7 @@ def readvals_claymore(url, rigname):
             w = workers[n]
             collectd.info('dispatching: worker{0} : {1} ({2} {3} {4})'.format(w['num'], w['rate'], w['temp'], w['watt'], w['fan']))
             miner.dispatch_worker(w['num'], rigname, cfg['algo'], [w['rate'], w['temp'], w['watt'], w['fan']])
+        miner.dispatch_miner(miner.get_master(), 'rigpass', rigname, software, cfg['algo'], uptime, pools, 1000, 'hash')
 
     except NameError, e:
         collectd.info('error parsing json for {0}:  {1}'.format(cfg['software'], e))
