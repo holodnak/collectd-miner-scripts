@@ -9,16 +9,12 @@ import collectd
 # for ethminer and claymore
 def GetData_JsonRpc(url):
 
-	ul = urlparse(url)
-	ip = ul.hostname
-	port = ul.port
         u = url.split(':')
         ip = u[0]
         port = u[1]
 	j = ''
-#	collectd.info("GetData_JsonRpc: connecting to: " + ip + ':' + port)
 
-	json_str = "{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\"}";
+	strout = "{\"id\":0,\"jsonrpc\":\"2.0\",\"method\":\"miner_getstat1\"}";
 	try:
 		tn = telnetlib.Telnet(ip, port, 15)
 	except:
@@ -26,7 +22,7 @@ def GetData_JsonRpc(url):
 		print "Unable to connect to miner: " + ip + ':' + port
 		return j
 	#tn.set_debuglevel(100)
-	tn.write(json_str + "\n")
+	tn.write(strout + "\n")
 	ret = tn.read_until("\n", 5)
 	tn.close()
 	try:
@@ -48,6 +44,41 @@ def GetData_RestApi(url):
         j = ''
         print "error loading/parsing json"
     return j
+
+def parse_raw(strn):
+  ns = strn.split("|")
+  ret = []
+  for n in ns:
+    dat = {}
+    if ';' not in n:
+      break
+    d = n.split(";")
+    for v in d:
+      kv = v.split("=")
+      dat[kv[0]] = kv[1]
+    ret.append(dat)
+  return ret
+
+# for other
+def GetData_Raw(url,strout):
+
+        u = url.split(':')
+        ip = u[0]
+        port = u[1]
+	j = ''
+
+	try:
+		tn = telnetlib.Telnet(ip, port, 15)
+	except:
+		collectd.info("GetData_JsonRpc: Unable to connect to miner: " + ip + ':' + port)
+		print "Unable to connect to miner: " + ip + ':' + port
+		return j
+	#tn.set_debuglevel(100)
+	tn.write(strout + "\n")
+	ret = tn.read_until("\n", 5)
+	tn.close()
+	return ret
+
 
 def dispatch_worker(ti, rigname, plugname, v):
     c = collectd.Values()

@@ -53,7 +53,7 @@ def readvals_claymore(url, rigname):
         collectd.info('error getting restapi for {0}:  {1}'.format(cfg['software'], e))
         return
 
-    print(j)
+    #print(j)
     # process the json returned
     try:
         software = "ethminer " + j['result'][0]
