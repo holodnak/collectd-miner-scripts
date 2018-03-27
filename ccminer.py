@@ -45,6 +45,7 @@ def readconf(config):
                 cfg[k] = node.values[0]
 
 def process_ret(j):
+    v = j.split(";")
     dat = {}
     for vv in v:
         kv = vv.split("=")
