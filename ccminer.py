@@ -45,13 +45,10 @@ def readconf(config):
                 cfg[k] = node.values[0]
 
 def process_ret(j):
-    v = j.split(";")
     dat = {}
     for vv in v:
         kv = vv.split("=")
         dat[kv[0]] = kv[1]
-        print("this var: " + kv[0])
-        print("this data: " + kv[1])
     return dat
 
 def readvals_claymore(url, rigname):
@@ -68,7 +65,6 @@ def readvals_claymore(url, rigname):
 
     dat = process_ret(j)
     dat2 = process_ret(j2)
-    print("=============================================================================================")
     dat3 = miner.parse_raw(j3)
     # process the json returned
     try:
