@@ -93,6 +93,12 @@ def dispatch_miner(remote_url, password, rigname, software, algo, uptime = 0, po
     except:
         collectd.info('error POST-ing miner data to remote host: {0}'.format(remote_url))
 
-def get_master():
+def dispatch_miner_stats(remote_url, password, rigname, temp, watt, fan):
+    try:
+        r = requests.post(remote_url, json={"password": password, "rigname": rigname, "temp": temp, "watt": watt, "fan": fan}, timeout=10)
+    except:
+        collectd.info('error POST-ing miner stats data to remote host: {0}'.format(remote_url))
 
+# this function returns the master that the stats are POST'ed to
+def get_master():
     return 'http://mstat.nesemu2.com/submit/james'
