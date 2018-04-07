@@ -55,6 +55,9 @@ def readvals_claymore(url, rigname):
 
     # process the json returned
     try:
+        if j == '':
+            return
+
         software = "Claymore " + j['result'][0]
         uptime = str(int(j['result'][1]) * 60)
         pools = j['result'][7]
@@ -111,7 +114,6 @@ def readvals_claymore(url, rigname):
 
         for n in workers:
             w = workers[n]
-            collectd.info('dispatching: worker{0} : {1} ({2} {3} {4})'.format(w['num'], w['rate'], w['temp'], w['watt'], w['fan']))
             miner.dispatch_worker(w['num'], rigname, cfg['algo'], [w['rate'], w['temp'], w['watt'], w['fan']])
         miner.dispatch_miner(miner.get_master(), 'rigpass', rigname, software, cfg['algo'], uptime, pools, 1000, 'hash')
 
