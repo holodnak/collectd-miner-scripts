@@ -58,8 +58,11 @@ def readvals_xmrstak(url, rigname):
         num = 0
         hashrate = j['hashrate']
         for n in hashrate['threads']:
-            collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(n[0])))
-            miner.dispatch_worker(num, rigname, cfg['algo'], [str(n[0]), 0, 0, 0])
+            rate = n[0]
+            if rate == None:
+               rate = n[1]
+            collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(rate)))
+            miner.dispatch_worker(num, rigname, cfg['algo'], [str(rate), 0, 0, 0])
             num = num + 1
         r = requests.post(miner.get_master(), json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool, "factor": 1, "unit": 'sol'})
     except NameError, e:
