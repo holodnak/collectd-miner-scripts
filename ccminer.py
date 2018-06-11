@@ -81,7 +81,6 @@ def readvals_claymore(url, rigname):
         workers = {}
         num = 0
         for n in dat3:
-            print n
             w = {
               'rate': n["KHS"],
               'temp': 0,
@@ -94,7 +93,6 @@ def readvals_claymore(url, rigname):
 
         for n in workers:
             w = workers[n]
-            collectd.info('dispatching: worker{0} : {1} ({2} {3} {4})'.format(w['num'], w['rate'], w['temp'], w['watt'], w['fan']))
             miner.dispatch_worker(w['num'], rigname, cfg['algo'], [w['rate'], w['temp'], w['watt'], w['fan']])
         miner.dispatch_miner(miner.get_master(), 'rigpass', rigname, software, cfg['algo'], uptime, pools, cfg['factor'], cfg['units'])
 
