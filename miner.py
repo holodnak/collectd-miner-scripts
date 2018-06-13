@@ -101,4 +101,4 @@ def dispatch_miner_stats(remote_url, password, rigname, temp, watt, fan):
 
 # this function returns the master that the stats are POST'ed to
 def get_master():
-    return 'http://mstat.nesemu2.com/submit/james'
+    return 'http://mstat/submit/james'
