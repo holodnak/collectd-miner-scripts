@@ -52,6 +52,8 @@ def readvals_xmrstak(url, rigname):
         return
 
     try:
+        if j == '':
+            return
         software = j['version']
         uptime = j['connection']['uptime']
         pool = j['connection']['pool']
@@ -61,7 +63,7 @@ def readvals_xmrstak(url, rigname):
             rate = n[0]
             if rate == None:
                rate = n[1]
-            collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(rate)))
+#            collectd.info('dispatching: {0} @ {1}'.format('worker' + str(num), str(rate)))
             miner.dispatch_worker(num, rigname, cfg['algo'], [str(rate), 0, 0, 0])
             num = num + 1
         r = requests.post(miner.get_master(), json={"password": "rigpass", "rigname": rigname, "uptime": uptime, "software": software, "algo": cfg['algo'], "pool": pool, "factor": 1, "unit": 'sol'})

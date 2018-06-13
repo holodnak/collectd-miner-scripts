@@ -45,7 +45,7 @@ def get_gpu_stat(handle):
 	ret['fan'] = 0
 
 	# return information gathered
-	print("temp: {0}, watt: {1}".format(ret['temp'], ret['watt']))
+	#print("temp: {0}, watt: {1}".format(ret['temp'], ret['watt']))
 	return ret
 
 def send_health_info(ti, rigname, v):
